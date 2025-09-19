@@ -4,15 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seattle Egg Prices - Find the Best Deals</title>
-    
-    <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TB94JESBJP"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-TB94JESBJP');
-    </script>
     <style>
         * {
             margin: 0;
@@ -641,6 +632,15 @@
             userVotes.push(storeName);
             localStorage.setItem('userVotes', JSON.stringify(userVotes));
             
+            // Track in Google Analytics
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'store_vote', {
+                    'store_name': storeName,
+                    'event_category': 'user_engagement',
+                    'event_label': storeName
+                });
+            }
+            
             // Show confirmation message
             const messageDiv = document.getElementById('voteMessage');
             messageDiv.textContent = `Thanks for voting for ${storeName}!`;
@@ -723,6 +723,15 @@
             // Add to user's voted list
             userVotes.push(storeName);
             localStorage.setItem('userVotes', JSON.stringify(userVotes));
+            
+            // Track custom store in Google Analytics
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'custom_store_request', {
+                    'store_name': storeName,
+                    'event_category': 'user_engagement',
+                    'event_label': storeName
+                });
+            }
             
             // Show confirmation
             const messageDiv = document.getElementById('voteMessage');
@@ -1020,6 +1029,3 @@
     </script>
 </body>
 </html>
-
-JSON.parse(localStorage.getItem('storeVotes'))
-
