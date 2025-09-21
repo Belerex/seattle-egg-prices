@@ -1,4 +1,4 @@
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -47,6 +47,36 @@
         .subtitle {
             font-size: 1.2em;
             opacity: 0.95;
+            margin-bottom: 20px;
+        }
+
+        /* ZIP Code Selector */
+        .zip-selector {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 15px;
+        }
+
+        .zip-selector label {
+            color: white;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        .zip-dropdown {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            background: white;
+            color: #333;
+            cursor: pointer;
+            min-width: 200px;
         }
 
         .last-updated {
@@ -56,6 +86,37 @@
             border-radius: 20px;
             display: inline-block;
             font-size: 0.9em;
+            color: white;
+        }
+
+        /* No Selection Message */
+        .no-selection {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            margin: 30px auto;
+            max-width: 600px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .no-selection h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .no-selection p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        /* Main Content (hidden by default) */
+        .main-content {
+            display: none;
+        }
+
+        .main-content.active {
+            display: block;
         }
 
         /* Summary Cards */
@@ -313,6 +374,25 @@
         .type-organic { background: #d1ecf1; color: #0c5460; }
         .type-pasture-raised { background: #f8d7da; color: #721c24; }
 
+        /* Sort Controls */
+        .sort-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .sort-select {
+            padding: 8px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .content-area {
@@ -345,49 +425,11 @@
             }
         }
 
-        /* Loading State */
         .loading {
             text-align: center;
             padding: 40px;
             color: white;
             font-size: 1.2em;
-        }
-
-        /* Sort Controls */
-        .sort-controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            background: white;
-            padding: 15px;
-            border-radius: 10px;
-        }
-
-        .sort-select {
-            padding: 8px 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 1em;
-            cursor: pointer;
-        }
-
-        .view-toggle {
-            display: flex;
-            gap: 10px;
-        }
-
-        .view-btn {
-            padding: 8px 12px;
-            border: 1px solid #e0e0e0;
-            background: white;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .view-btn.active {
-            background: #667eea;
-            color: white;
         }
     </style>
 </head>
@@ -395,497 +437,348 @@
     <div class="container">
         <header>
             <h1>🥚 Seattle Egg Price Tracker</h1>
-            <p class="subtitle">Find the best egg prices in ZIP 98102</p>
-            <div class="last-updated" id="lastUpdated">Loading...</div>
+            <p class="subtitle">Find the best egg prices in Seattle</p>
+            
+            <!-- ZIP Code Selector -->
+            <div class="zip-selector">
+                <label for="zipSelect">Select your area:</label>
+                <select id="zipSelect" class="zip-dropdown">
+                    <option value="">-- Choose ZIP Code --</option>
+                    <option value="98102">Capitol Hill (98102)</option>
+                    <option value="98105">U-District (98105)</option>
+                </select>
+            </div>
+            
+            <div class="last-updated" id="lastUpdated">Select a ZIP code to see prices</div>
         </header>
 
-        <!-- Beta Feedback Banner -->
-        <div style="background: linear-gradient(135deg, #ffd93d 0%, #ffb347 100%); padding: 20px; border-radius: 15px; text-align: center; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
-            <h3 style="margin: 0 0 10px 0; color: #333;">🚧 Beta Version - Help Us Improve!</h3>
-            <p style="margin: 0 0 15px 0; color: #333;">Currently tracking Safeway, Trader Joe's, QFC, Target, and Whole Foods (Capitol Hill). Which store should we add next?</p>
-            <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-                <button onclick="showOtherStoreInput()" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">
-                    Request Other Store
-                </button>
-            </div>
-            </div> <!-- This closes your Beta Feedback Banner -->
-
-        <!-- Add Email Signup Here -->
-        <div style="background: linear-gradient(135deg, #ffd93d 0%, #ffb347 100%); padding: 20px; border-radius: 15px; text-align: center; margin: 20px 0; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
-            <h3>📧 Get Weekly Price Updates</h3>
-            <p>Be first to know when egg prices drop</p>
-            <a href="https://docs.google.com/forms/d/e/1FAIpQLSdmZ-IgNl68iURYqfjSg3s7blc_sEqhq7svOM8SLkFOHKUI6w/viewform?usp=dialog" target="_blank" style="display: inline-block; padding: 10px 20px; background: #667eea; color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">Subscribe for Updates</a>
-            </div>
-
-<!-- Summary Cards -->
-<div class="summary-cards">
-            
-            <!-- Other Store Input (Hidden by default) -->
-            <div id="otherStoreInput" style="display: none; margin-top: 15px;">
-                <input type="text" id="customStoreName" placeholder="Enter store name (e.g., Costco, Fred Meyer)" 
-                       style="padding: 10px; border: 2px solid #333; border-radius: 8px; width: 250px; margin-right: 10px;">
-                <button onclick="submitCustomStore()" 
-                        style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">
-                    Submit Request
-                </button>
-                <button onclick="cancelCustomStore()" 
-                        style="padding: 10px 20px; background: #ccc; color: #333; border: none; border-radius: 8px; cursor: pointer; margin-left: 5px;">
-                    Cancel
-                </button>
-            </div>
-            
-            <div id="voteMessage" style="margin-top: 15px; font-weight: bold; color: green; display: none;"></div>
+        <!-- No Selection Message -->
+        <div id="noSelection" class="no-selection">
+            <h2>👆 Select Your Neighborhood</h2>
+            <p>Choose your ZIP code above to see egg prices from 5 major stores in your area.</p>
+            <p style="margin-top: 15px; font-size: 0.9em;">Currently tracking: Safeway, QFC, Target, Trader Joe's, and Whole Foods</p>
         </div>
 
-        <!-- Summary Cards -->
-        <div class="summary-cards">
-            <div class="summary-card">
-                <h3>Cheapest Dozen</h3>
-                <div class="value" id="cheapestPrice">--</div>
-                <div class="detail" id="cheapestDetail">--</div>
+        <!-- Main Content (Hidden until ZIP selected) -->
+        <div id="mainContent" class="main-content">
+            <!-- Beta Feedback Banner -->
+            <div style="background: linear-gradient(135deg, #ffd93d 0%, #ffb347 100%); padding: 20px; border-radius: 15px; text-align: center; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                <h3 style="margin: 0 0 10px 0; color: #333;">🚧 Beta Version - Help Us Improve!</h3>
+                <p style="margin: 0 0 15px 0; color: #333;">Which store should we add next?</p>
+                <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                    <button onclick="showOtherStoreInput()" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                        Request Other Store
+                    </button>
+                </div>
+                
+                <div id="otherStoreInput" style="display: none; margin-top: 15px;">
+                    <input type="text" id="customStoreName" placeholder="Enter store name (e.g., Costco, Fred Meyer)" 
+                           style="padding: 10px; border: 2px solid #333; border-radius: 8px; width: 250px; margin-right: 10px;">
+                    <button onclick="submitCustomStore()" 
+                            style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                        Submit Request
+                    </button>
+                    <button onclick="cancelCustomStore()" 
+                            style="padding: 10px 20px; background: #ccc; color: #333; border: none; border-radius: 8px; cursor: pointer; margin-left: 5px;">
+                        Cancel
+                    </button>
+                </div>
+                
+                <div id="voteMessage" style="margin-top: 15px; font-weight: bold; color: green; display: none;"></div>
             </div>
-            <div class="summary-card">
-                <h3>Average Price</h3>
-                <div class="value" id="averagePrice">--</div>
-                <div class="detail">Per dozen eggs</div>
-            </div>
-            <div class="summary-card">
-                <h3>Total Listings</h3>
-                <div class="value" id="totalListings">--</div>
-                <div class="detail" id="storeCount">--</div>
-            </div>
-            <div class="summary-card">
-                <h3>Best Store</h3>
-                <div class="value" id="bestStore">--</div>
-                <div class="detail" id="bestStoreDetail">--</div>
-            </div>
-        </div>
 
-        <!-- Filters -->
-        <div class="filters">
-            <input type="text" class="search-box" id="searchBox" placeholder="🔍 Search by store, brand, or product name...">
-            
-            <div class="filter-group">
-                <label>Store:</label>
-                <button class="filter-btn active" data-filter="store" data-value="all">All Stores</button>
-                <button class="filter-btn" data-filter="store" data-value="Safeway">Safeway</button>
-                <button class="filter-btn" data-filter="store" data-value="Target">Target</button>
-                <button class="filter-btn" data-filter="store" data-value="QFC">QFC</button>
-                <button class="filter-btn" data-filter="store" data-value="Whole Foods">Whole Foods</button>
-                <button class="filter-btn" data-filter="store" data-value="Trader Joe's">Trader Joe's</button>
+            <!-- Email Signup -->
+            <div style="background: linear-gradient(135deg, #ffd93d 0%, #ffb347 100%); padding: 20px; border-radius: 15px; text-align: center; margin: 20px 0; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                <h3>📧 Get Weekly Price Updates</h3>
+                <p>Be first to know when egg prices drop</p>
+                <a href="https://docs.google.com/forms/d/e/1FAIpQLSdmZ-IgNl68iURYqfjSg3s7blc_sEqhq7svOM8SLkFOHKUI6w/viewform?usp=dialog" target="_blank" style="display: inline-block; padding: 10px 20px; background: #667eea; color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">Subscribe for Updates</a>
             </div>
-            
-            <div class="filter-group">
-                <label>Size:</label>
-                <button class="filter-btn active" data-filter="size" data-value="all">All Sizes</button>
-                <button class="filter-btn" data-filter="size" data-value="large">Large</button>
-                <button class="filter-btn" data-filter="size" data-value="extra-large">Extra Large</button>
-                <button class="filter-btn" data-filter="size" data-value="jumbo">Jumbo</button>
-            </div>
-        </div>
 
-        <!-- Sort Controls -->
-        <div class="sort-controls">
-            <div>
-                <label for="sortSelect">Sort by: </label>
-                <select id="sortSelect" class="sort-select">
-                    <option value="total_low">Total Price: Low to High</option>
-                    <option value="total_high">Total Price: High to Low</option>
-                    <option value="price_low">Price Per Dozen: Low to High</option>
-                    <option value="price_high">Price Per Dozen: High to Low</option>
-                    <option value="store">Store Name</option>
-                    <option value="type">Production Type</option>
-            </select>
-            </div>
-            <div class="view-toggle">
-                <button class="view-btn active" data-view="grid">Grid View</button>
-                <button class="view-btn" data-view="list">List View</button>
-            </div>
-        </div>
-
-        <!-- Main Content Area -->
-        <div class="content-area">
-            <!-- Category Sidebar -->
-            <div class="category-sidebar">
-                <div class="category-header">Categories</div>
-                <div class="category-item active" data-category="all">
-                    <span><span class="category-icon">📦</span> All Products</span>
-                    <span class="category-count" id="countAll">0</span>
+            <!-- Summary Cards -->
+            <div class="summary-cards">
+                <div class="summary-card">
+                    <h3>Cheapest Dozen</h3>
+                    <div class="value" id="cheapestPrice">--</div>
+                    <div class="detail" id="cheapestDetail">--</div>
                 </div>
-                <div class="category-item" data-category="conventional">
-                    <span><span class="category-icon">🥚</span> Conventional</span>
-                    <span class="category-count" id="countConventional">0</span>
+                <div class="summary-card">
+                    <h3>Average Price</h3>
+                    <div class="value" id="averagePrice">--</div>
+                    <div class="detail">Per dozen eggs</div>
                 </div>
-                <div class="category-item" data-category="cage-free">
-                    <span><span class="category-icon">🐓</span> Cage-Free</span>
-                    <span class="category-count" id="countCageFree">0</span>
+                <div class="summary-card">
+                    <h3>Total Listings</h3>
+                    <div class="value" id="totalListings">--</div>
+                    <div class="detail" id="storeCount">--</div>
                 </div>
-                <div class="category-item" data-category="free-range">
-                    <span><span class="category-icon">🌾</span> Free-Range</span>
-                    <span class="category-count" id="countFreeRange">0</span>
-                </div>
-                <div class="category-item" data-category="organic">
-                    <span><span class="category-icon">🌿</span> Organic</span>
-                    <span class="category-count" id="countOrganic">0</span>
-                </div>
-                <div class="category-item" data-category="pasture-raised">
-                    <span><span class="category-icon">🌳</span> Pasture-Raised</span>
-                    <span class="category-count" id="countPastureRaised">0</span>
+                <div class="summary-card">
+                    <h3>Best Store</h3>
+                    <div class="value" id="bestStore">--</div>
+                    <div class="detail" id="bestStoreDetail">--</div>
                 </div>
             </div>
 
-            <!-- Products Grid -->
-            <div class="products-grid" id="productsGrid">
-                <div class="loading">Loading egg prices...</div>
+            <!-- Filters -->
+            <div class="filters">
+                <input type="text" class="search-box" id="searchBox" placeholder="🔍 Search by store, brand, or product name...">
+                
+                <div class="filter-group">
+                    <label>Store:</label>
+                    <button class="filter-btn active" data-filter="store" data-value="all">All Stores</button>
+                    <button class="filter-btn" data-filter="store" data-value="Safeway">Safeway</button>
+                    <button class="filter-btn" data-filter="store" data-value="Target">Target</button>
+                    <button class="filter-btn" data-filter="store" data-value="QFC">QFC</button>
+                    <button class="filter-btn" data-filter="store" data-value="Whole Foods">Whole Foods</button>
+                    <button class="filter-btn" data-filter="store" data-value="Trader Joe's">Trader Joe's</button>
+                </div>
+                
+                <div class="filter-group">
+                    <label>Size:</label>
+                    <button class="filter-btn active" data-filter="size" data-value="all">All Sizes</button>
+                    <button class="filter-btn" data-filter="size" data-value="large">Large</button>
+                    <button class="filter-btn" data-filter="size" data-value="extra-large">Extra Large</button>
+                    <button class="filter-btn" data-filter="size" data-value="jumbo">Jumbo</button>
+                    <button class="filter-btn" data-filter="size" data-value="medium">Medium</button>
+                </div>
+            </div>
+
+            <!-- Sort Controls -->
+            <div class="sort-controls">
+                <div>
+                    <label for="sortSelect">Sort by: </label>
+                    <select id="sortSelect" class="sort-select">
+                        <option value="total_low">Total Price: Low to High</option>
+                        <option value="total_high">Total Price: High to Low</option>
+                        <option value="price_low">Price Per Dozen: Low to High</option>
+                        <option value="price_high">Price Per Dozen: High to Low</option>
+                        <option value="store">Store Name</option>
+                        <option value="type">Production Type</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="content-area">
+                <!-- Category Sidebar -->
+                <div class="category-sidebar">
+                    <div class="category-header">Categories</div>
+                    <div class="category-item active" data-category="all">
+                        <span><span class="category-icon">📦</span> All Products</span>
+                        <span class="category-count" id="countAll">0</span>
+                    </div>
+                    <div class="category-item" data-category="conventional">
+                        <span><span class="category-icon">🥚</span> Conventional</span>
+                        <span class="category-count" id="countConventional">0</span>
+                    </div>
+                    <div class="category-item" data-category="cage-free">
+                        <span><span class="category-icon">🐓</span> Cage-Free</span>
+                        <span class="category-count" id="countCageFree">0</span>
+                    </div>
+                    <div class="category-item" data-category="free-range">
+                        <span><span class="category-icon">🌾</span> Free-Range</span>
+                        <span class="category-count" id="countFreeRange">0</span>
+                    </div>
+                    <div class="category-item" data-category="organic">
+                        <span><span class="category-icon">🌿</span> Organic</span>
+                        <span class="category-count" id="countOrganic">0</span>
+                    </div>
+                    <div class="category-item" data-category="pasture-raised">
+                        <span><span class="category-icon">🌳</span> Pasture-Raised</span>
+                        <span class="category-count" id="countPastureRaised">0</span>
+                    </div>
+                </div>
+
+                <!-- Products Grid -->
+                <div class="products-grid" id="productsGrid">
+                    <div class="loading">Loading egg prices...</div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Your actual egg data collected from the websites
-        const eggData = [
-            // SAFEWAY - Capitol Hill Location (1410 E John St)
-            {store: "Safeway", brand: "Eggland's Best", product: "Cage Free Large Brown Eggs", count: 18, price: 8.99, type: "cage-free", size: "large"},
-            {store: "Safeway", brand: "Vital Farms", product: "Extra Large Pasture Raised Eggs", count: 12, price: 8.99, type: "pasture-raised", size: "extra-large"},
-            {store: "Safeway", brand: "Vital Farms", product: "Pasture-Raised Eggs Large Eggs", count: 18, price: 12.49, type: "pasture-raised", size: "large"},
-            {store: "Safeway", brand: "Eggland's Best", product: "Cage Free Large White Eggs", count: 12, price: 6.79, type: "cage-free", size: "large"},
-            {store: "Safeway", brand: "Lucerne Farms", product: "Large Cage Free Eggs", count: 12, price: 5.99, type: "cage-free", size: "large"},
-            {store: "Safeway", brand: "Lucerne Farms", product: "Cage Free Large Eggs", count: 18, price: 8.99, type: "cage-free", size: "large"},
-            {store: "Safeway", brand: "Lucerne", product: "Cage Free Grade A Large Eggs", count: 60, price: 26.69, type: "cage-free", size: "large"},
-            {store: "Safeway", brand: "Eggland's Best", product: "Cage Free Large Brown Eggs", count: 18, price: 8.99, type: "cage-free", size: "large"},
-            {store: "Safeway", brand: "O Organics", product: "Organic Eggs Large Brown", count: 12, price: 7.49, type: "organic", size: "large"},
-            {store: "Safeway", brand: "Vital Farms", product: "Pasture-Raised Eggs Large", count: 18, price: 12.49, type: "pasture-raised", size: "large"},
-            {store: "Safeway", brand: "Eggland's Best", product: "Cage Free Large White Eggs", count: 24, price: 12.49, type: "cage-free", size: "large"},
-            {store: "Safeway", brand: "Vital Farms", product: "Pasture Raised Large Eggs", count: 12, price: 8.99, type: "pasture-raised", size: "large"},
-            {store: "Safeway", brand: "Lucerne", product: "Cage Free Jumbo Eggs", count: 12, price: 6.39, type: "cage-free", size: "jumbo"},
-            {store: "Safeway", brand: "Eggland's Best", product: "Cage Free Large White Eggs", count: 12, price: 6.79, type: "cage-free", size: "large"},
-            {store: "Safeway", brand: "Lucerne Farms", product: "Cage Free Extra Large Eggs", count: 12, price: 6.19, type: "cage-free", size: "extra-large"},
-            {store: "Safeway", brand: "Vital Farms", product: "Pasture Raised Extra Large Eggs", count: 12, price: 8.99, type: "pasture-raised", size: "extra-large"},
-            {store: "Safeway", brand: "Happy Egg Co.", product: "Free Range Large Brown Eggs", count: 12, price: 7.49, type: "free-range", size: "large"},
-            {store: "Safeway", brand: "Vital Farms", product: "Pasture-Raised Large Eggs", count: 12, price: 8.99, type: "pasture-raised", size: "large"},
-            {store: "Safeway", brand: "Vital Farms Organic", product: "Pasture Raised Organic Large Grade A Eggs", count: 12, price: 10.49, type: "organic", size: "large"},
-            {store: "Safeway", brand: "Eggland's Best", product: "Cage Free Large White Eggs", count: 24, price: 12.49, type: "cage-free", size: "large"},
-            {store: "Safeway", brand: "Happy Egg Co.", product: "Free Range Organic Large Brown Eggs", count: 12, price: 8.99, type: "organic", size: "large"},
-            {store: "Safeway", brand: "Eggland's Best", product: "Cage Free Large White Eggs", count: 18, price: 8.99, type: "cage-free", size: "large"},
-            {store: "Safeway", brand: "Happy Egg", product: "Free Range Large Brown Eggs", count: 18, price: 9.99, type: "free-range", size: "large"},
-            {store: "Safeway", brand: "Eggland's Best", product: "Cage Free Large Brown Eggs", count: 12, price: 7.49, type: "cage-free", size: "large"},
-            {store: "Safeway", brand: "O Organics", product: "Organic Eggs Large Brown", count: 18, price: 10.49, type: "organic", size: "large"},
-            {store: "Safeway", brand: "Open Nature", product: "Brown Free Range Large Eggs", count: 12, price: 6.79, type: "free-range", size: "large"},
-            {store: "Safeway", brand: "Happy Egg", product: "Free Range Organic Large Brown Eggs", count: 12, price: 8.99, type: "organic", size: "large"},
-            {store: "Safeway", brand: "Open Nature", product: "Brown Free Range Large Eggs", count: 18, price: 8.99, type: "free-range", size: "large"},
-            {store: "Safeway", brand: "Eggland's Best", product: "Cage Free Large White Eggs", count: 18, price: 8.99, type: "cage-free", size: "large"},
-            {store: "Safeway", brand: "Open Nature", product: "Brown Free Range Large Eggs", count: 12, price: 6.79, type: "free-range", size: "large"},
-            {store: "Safeway", brand: "O Organics", product: "Brown Pasture Raised Large Grade A Eggs", count: 12, price: 9.99, type: "pasture-raised", size: "large"},
-            {store: "Safeway", brand: "Eggland's Best", product: "Cage Free Extra Large White Eggs", count: 12, price: 7.49, type: "cage-free", size: "extra-large"},
-            {store: "Safeway", brand: "Lucerne Farms", product: "Cage Free Medium Grade A Eggs", count: 60, price: 25.69, type: "cage-free", size: "medium"},
-            {store: "Safeway", brand: "Lucerne Farms", product: "Cage Free Large Eggs", count: 6, price: 3.99, type: "cage-free", size: "large"},
-            {store: "Safeway", brand: "Eggland's Best", product: "USDA Organic Certified Large Brown Eggs", count: 12, price: 7.99, type: "organic", size: "large"},
-            {store: "Safeway", brand: "Wilcox Family Farms", product: "Organic Large Omega Eggs", count: 12, price: 8.49, type: "organic", size: "large"},
-            {store: "Safeway", brand: "Happy Egg", product: "Pasture Raised Large Brown Eggs", count: 12, price: 8.49, type: "pasture-raised", size: "large"},
-            {store: "Safeway", brand: "Vital Farms", product: "Organic Pasture Raised Large Eggs", count: 18, price: 15.99, type: "organic", size: "large"},
-            {store: "Trader Joe's", brand: "Carol's Eggs", product: "Grade A Cage-Free Large Brown Eggs", count: 12, price: 5.99, type: "cage-free", size: "large"},
-            {store: "Trader Joe's", brand: "Trader Joe's", product: "Organic Pasture-Raised Large Brown Eggs", count: 12, price: 6.99, type: "organic", size: "large"},
-            {store: "QFC", brand: "Happy Egg", product: "Free-Range Large Brown Eggs", count: 18, price: 8.99, type: "free-range", size: "large"},
-            {store: "QFC", brand: "Vital Farms", product: "Pasture-Raised Large Brown Eggs", count: 12, price: 8.49, type: "pasture-raised", size: "large"},
-            {store: "QFC", brand: "Vital Farms", product: "Pasture-Raised Large Brown Eggs", count: 18, price: 12.49, type: "pasture-raised", size: "large"},
-            {store: "QFC", brand: "Nellie", product: "Free-Range Large Eggs", count: 12, price: 6.99, type: "free-range", size: "large"},
-            {store: "QFC", brand: "QFC", product: "Cage-Free Large White Grade AA Eggs", count: 12, price: 2.89, type: "cage-free", size: "large"},
-            {store: "QFC", brand: "Simple Truth", product: "Cage-Free Large Brown Eggs", count: 18, price: 8.79, type: "cage-free", size: "large"},
-            {store: "QFC", brand: "QFC", product: "Cage-Free Large White Grade AA Eggs", count: 18, price: 4.29, type: "cage-free", size: "large"},
-            {store: "QFC", brand: "Vital Farms", product: "Pasture-Raised Large Brown Organic Eggs", count: 12, price: 9.99, type: "pasture-raised", size: "large"},
-            {store: "QFC", brand: "Simple Truth", product: "Natural Cage-Free Grade AA Large Brown Eggs", count: 12, price: 5.99, type: "cage-free", size: "large"},
-            {store: "QFC", brand: "QFC", product: "Cage-Free Extra-Large White Grade AA Eggs", count: 12, price: 3.09, type: "cage-free", size: "extra-large"},
-            {store: "QFC", brand: "Happy Egg", product: "Free-Range Brown Eggs", count: 12, price: 7.49, type: "free-range", size: "large"},
-            {store: "QFC", brand: "Eggland's Best", product: "Cage-Free Large White Eggs", count: 18, price: 8.49, type: "cage-free", size: "large"},
-            {store: "QFC", brand: "Simple Truth", product: "Organic Cage-Free Grade AA Large Brown Eggs", count: 12, price: 6.99, type: "cage-free", size: "large"},
-            {store: "QFC", brand: "QFC", product: "Cage-Free Jumbo White Eggs", count: 12, price: 3.29, type: "cage-free", size: "jumbo"},
-            {store: "QFC", brand: "Wilcox", product: "Free-Range Large Brown Organic Omega-3 Eggs", count: 12, price: 7.49, type: "free-range", size: "large"},
-            {store: "QFC", brand: "Pete & Gerry", product: "Organic Free-Range Large Eggs", count: 12, price: 7.99, type: "free-range", size: "large"},
-            {store: "QFC", brand: "Happy Egg", product: "Organic Free-Range Grade A Eggs", count: 18, price: 13.29, type: "free-range", size: "large"},
-            {store: "QFC", brand: "Eggland's Best", product: "Cage-Free Large White Eggs", count: 12, price: 5.69, type: "cage-free", size: "large"},
-            {store: "QFC", brand: "Simple Truth Organic", product: "Cage-Free Large Brown Eggs", count: 18, price: 10.29, type: "cage-free", size: "large"},
-            {store: "QFC", brand: "Pete & Gerry", product: "Organic Free-Range Large Eggs", count: 18, price: 11.79, type: "free-range", size: "large"},
-            {store: "QFC", brand: "Vital Farms", product: "Extra-Large Pasture-Raised Eggs", count: 12, price: 8.99, type: "pasture-raised", size: "extra-large"},
-            {store: "QFC", brand: "Happy Egg", product: "Organic Free-Range Large Brown Eggs", count: 12, price: 8.99, type: "free-range", size: "large"},
-            {store: "QFC", brand: "Nellie", product: "Free Range Large Eggs", count: 18, price: 10.29, type: "free-range", size: "large"},
-            {store: "QFC", brand: "Simple Truth", product: "Kipster Cage-Free Large White Eggs", count: 12, price: 4.99, type: "cage-free", size: "large"},
-            {store: "QFC", brand: "Wilcox", product: "Organic Cage-Free Extra-Large Brown Eggs", count: 6, price: 3.99, type: "cage-free", size: "extra-large"},
-            {store: "QFC", brand: "Wilcox", product: "Pasture-Raised Large Brown Omega-3 Eggs", count: 12, price: 7.69, type: "pasture-raised", size: "large"},
-            {store: "QFC", brand: "Eggland's Best", product: "Cage-Free Large White Eggs", count: 18, price: 8.49, type: "cage-free", size: "large"},
-            {store: "QFC", brand: "Kroger", product: "Extra-Large Grade AA White Eggs", count: 12, price: 3.09, type: "conventional", size: "extra-large"},
-            {store: "QFC", brand: "Eggland's Best", product: "Cage-Free Large Brown Eggs", count: 12, price: 6.19, type: "cage-free", size: "large"},
-            {store: "QFC", brand: "Eggland's Best", product: "Cage-Free Extra-Large White Eggs", count: 12, price: 6.19, type: "cage-free", size: "extra-large"},
-            {store: "QFC", brand: "Eggland's Best", product: "Organic Large Brown Eggs", count: 12, price: 7.19, type: "organic", size: "large"},
-            {store: "Target", brand: "Vital Farms", product: "Pasture-Raised Grade A Large Eggs", count: 12, price: 6.89, type: "pasture-raised", size: "large"},
-            {store: "Target", brand: "Happy Egg", product: "Large Brown Organic Free Range Grade A Eggs", count: 12, price: 7.79, type: "organic", size: "large"},
-            {store: "Target", brand: "Good & Gather", product: "Cage-Free Grade A Large Brown Eggs", count: 12, price: 4.29, type: "cage-free", size: "large"},
-            {store: "Target", brand: "Good & Gather", product: "Cage-Free Large White Grade A Eggs", count: 18, price: 4.99, type: "cage-free", size: "large"},
-            {store: "Target", brand: "Good & Gather", product: "Cage-Free Large White Fresh Grade A Eggs", count: 12, price: 2.89, type: "cage-free", size: "large"},
-            {store: "Target", brand: "Vital Farms", product: "Pasture-Raised Grade A Large Eggs", count: 12, price: 6.89, type: "pasture-raised", size: "large"},
-            {store: "Target", brand: "Vital Farms", product: "Organic Pasture-Raised Grade A Large Eggs", count: 12, price: 9.79, type: "organic", size: "large"},
-            {store: "Target", brand: "Good & Gather", product: "Organic Cage-Free Grade A Large Brown Eggs", count: 12, price: 5.69, type: "organic", size: "large"},
-            {store: "Target", brand: "Vital Farms", product: "Pasture-Raised Large Eggs", count: 18, price: 9.99, type: "pasture-raised", size: "large"},
-            {store: "Target", brand: "Happy Egg", product: "Large Brown Organic Free Range Grade A Eggs", count: 12, price: 7.79, type: "organic", size: "large"},
-            {store: "Target", brand: "Vital Farms", product: "Organic Pasture-Raised Grade A Large Eggs", count: 12, price: 9.79, type: "organic", size: "large"},
-            {store: "Target", brand: "Happy Egg", product: "Large Brown Grade A Free Range Brown Eggs", count: 12, price: 7.29, type: "free-range", size: "large"},
-            {store: "Whole Foods", brand: "Wilcox Farm", product: "Large Grade AA Brown Eggs", count: 12, price: 7.09, type: "conventional", size: "large"},
-            {store: "Whole Foods", brand: "Pete & Gerry's", product: "Large Grade A Eggs", count: 12, price: 6.99, type: "conventional", size: "large"},
-            {store: "Whole Foods", brand: "Vital Farms", product: "Large Grade A Eggs", count: 12, price: 7.99, type: "conventional", size: "large"},
-            {store: "Whole Foods", brand: "Vital Farms", product: "Extra-Large Grade A Eggs", count: 12, price: 8.49, type: "conventional", size: "extra-large"},
-            {store: "Whole Foods", brand: "Vital Farms", product: "Organic Large Grade A Eggs", count: 18, price: 12.99, type: "organic", size: "large"},
-            {store: "Whole Foods", brand: "Pete & Gerry's", product: "Large Grade A Eggs", count: 18, price: 9.99, type: "organic", size: "large"},
-            {store: "Whole Foods", brand: "Vital Farms", product: "Organic Large Grade A Eggs", count: 12, price: 9.99, type: "organic", size: "large"},
-            {store: "Whole Foods", brand: "Vital Farms", product: "Organic Grade A Extra-Large Eggs", count: 12, price: 10.03, type: "organic", size: "extra-large"},
-            {store: "Whole Foods", brand: "Pete & Gerry's", product: "Organic Brown Large Grade A Eggs", count: 12, price: 7.99, type: "organic", size: "large"},
-            {store: "Whole Foods", brand: "Organic Valley", product: "Organic Brown Large Grade A Eggs", count: 12, price: 7.69, type: "organic", size: "large"},
-            {store: "Whole Foods", brand: "Organic Valley", product: "Organic Grade A Large Brown Eggs", count: 18, price: 8.25, type: "organic", size: "large"},
-            {store: "Whole Foods", brand: "Alexandre Family Farms", product: "Organic Jumbo Grade AA Eggs", count: 6, price: 6.49, type: "organic", size: "jumbo"},
-            {store: "Whole Foods", brand: "Pete & Gerry's", product: "Pasture Raised Grade A Brown Eggs", count: 18, price: 8.99, type: "pasture-raised", size: "large"},
-            {store: "Whole Foods", brand: "365 by Whole Foods Market", product: "Large White Grade A Eggs", count: 12, price: 5.49, type: "conventional", size: "large"},
-            {store: "Whole Foods", brand: "365 by Whole Foods Market", product: "Large Brown Grade A Eggs", count: 12, price: 5.49, type: "conventional", size: "large"},
-            {store: "Whole Foods", brand: "365 by Whole Foods Market", product: "Extra-Large Brown Grade A Eggs", count: 12, price: 5.79, type: "conventional", size: "extra-large"},
-            {store: "Whole Foods", brand: "365 by Whole Foods Market", product: "Extra-Large Grade A Brown Eggs", count: 12, price: 6.79, type: "organic", size: "extra-large"},
-            {store: "Whole Foods", brand: "365 by Whole Foods Market", product: "Organic Omega-3 Large Brown Grade A Eggs", count: 12, price: 6.99, type: "organic", size: "large"}
-        ];
+        // Data structure for multiple ZIP codes
+        const eggDataByZip = {
+            '98102': [
+                // SAFEWAY - Capitol Hill Location
+                {store: "Safeway", brand: "Eggland's Best", product: "Cage Free Large Brown Eggs", count: 18, price: 8.99, type: "cage-free", size: "large"},
+                {store: "Safeway", brand: "Vital Farms", product: "Extra Large Pasture Raised Eggs", count: 12, price: 8.99, type: "pasture-raised", size: "extra-large"},
+                {store: "Safeway", brand: "Vital Farms", product: "Pasture-Raised Eggs Large Eggs", count: 18, price: 12.49, type: "pasture-raised", size: "large"},
+                {store: "Safeway", brand: "Eggland's Best", product: "Cage Free Large White Eggs", count: 12, price: 6.79, type: "cage-free", size: "large"},
+                {store: "Safeway", brand: "Lucerne Farms", product: "Large Cage Free Eggs", count: 12, price: 5.99, type: "cage-free", size: "large"},
+                {store: "Safeway", brand: "Lucerne Farms", product: "Cage Free Large Eggs", count: 18, price: 8.99, type: "cage-free", size: "large"},
+                {store: "Safeway", brand: "Lucerne", product: "Cage Free Grade A Large Eggs", count: 60, price: 26.69, type: "cage-free", size: "large"},
+                {store: "Safeway", brand: "O Organics", product: "Organic Eggs Large Brown", count: 12, price: 7.49, type: "organic", size: "large"},
+                {store: "Safeway", brand: "Vital Farms", product: "Pasture Raised Large Eggs", count: 12, price: 8.99, type: "pasture-raised", size: "large"},
+                {store: "Safeway", brand: "Lucerne", product: "Cage Free Jumbo Eggs", count: 12, price: 6.39, type: "cage-free", size: "jumbo"},
+                {store: "Safeway", brand: "Lucerne Farms", product: "Cage Free Extra Large Eggs", count: 12, price: 6.19, type: "cage-free", size: "extra-large"},
+                {store: "Safeway", brand: "Vital Farms", product: "Pasture Raised Extra Large Eggs", count: 12, price: 8.99, type: "pasture-raised", size: "extra-large"},
+                {store: "Safeway", brand: "Happy Egg Co.", product: "Free Range Large Brown Eggs", count: 12, price: 7.49, type: "free-range", size: "large"},
+                {store: "Safeway", brand: "Vital Farms", product: "Pasture-Raised Large Eggs", count: 12, price: 8.99, type: "pasture-raised", size: "large"},
+                {store: "Safeway", brand: "Vital Farms Organic", product: "Pasture Raised Organic Large Grade A Eggs", count: 12, price: 10.49, type: "organic", size: "large"},
+                {store: "Safeway", brand: "Eggland's Best", product: "Cage Free Large White Eggs", count: 24, price: 12.49, type: "cage-free", size: "large"},
+                {store: "Safeway", brand: "Happy Egg Co.", product: "Free Range Organic Large Brown Eggs", count: 12, price: 8.99, type: "organic", size: "large"},
+                {store: "Safeway", brand: "Happy Egg", product: "Free Range Large Brown Eggs", count: 18, price: 9.99, type: "free-range", size: "large"},
+                {store: "Safeway", brand: "Eggland's Best", product: "Cage Free Large Brown Eggs", count: 12, price: 7.49, type: "cage-free", size: "large"},
+                {store: "Safeway", brand: "O Organics", product: "Organic Eggs Large Brown", count: 18, price: 10.49, type: "organic", size: "large"},
+                {store: "Safeway", brand: "Open Nature", product: "Brown Free Range Large Eggs", count: 12, price: 6.79, type: "free-range", size: "large"},
+                {store: "Safeway", brand: "Happy Egg", product: "Free Range Organic Large Brown Eggs", count: 12, price: 8.99, type: "organic", size: "large"},
+                {store: "Safeway", brand: "Open Nature", product: "Brown Free Range Large Eggs", count: 18, price: 8.99, type: "free-range", size: "large"},
+                {store: "Safeway", brand: "O Organics", product: "Brown Pasture Raised Large Grade A Eggs", count: 12, price: 9.99, type: "pasture-raised", size: "large"},
+                {store: "Safeway", brand: "Eggland's Best", product: "Cage Free Extra Large White Eggs", count: 12, price: 7.49, type: "cage-free", size: "extra-large"},
+                {store: "Safeway", brand: "Lucerne Farms", product: "Cage Free Medium Grade A Eggs", count: 60, price: 25.69, type: "cage-free", size: "medium"},
+                {store: "Safeway", brand: "Lucerne Farms", product: "Cage Free Large Eggs", count: 6, price: 3.99, type: "cage-free", size: "large"},
+                {store: "Safeway", brand: "Eggland's Best", product: "USDA Organic Certified Large Brown Eggs", count: 12, price: 7.99, type: "organic", size: "large"},
+                {store: "Safeway", brand: "Wilcox Family Farms", product: "Organic Large Omega Eggs", count: 12, price: 8.49, type: "organic", size: "large"},
+                {store: "Safeway", brand: "Happy Egg", product: "Pasture Raised Large Brown Eggs", count: 12, price: 8.49, type: "pasture-raised", size: "large"},
+                {store: "Safeway", brand: "Vital Farms", product: "Organic Pasture Raised Large Eggs", count: 18, price: 15.99, type: "organic", size: "large"},
+                // TRADER JOE'S
+                {store: "Trader Joe's", brand: "Carol's Eggs", product: "Grade A Cage-Free Large Brown Eggs", count: 12, price: 5.99, type: "cage-free", size: "large"},
+                {store: "Trader Joe's", brand: "Trader Joe's", product: "Organic Pasture-Raised Large Brown Eggs", count: 12, price: 6.99, type: "organic", size: "large"},
+                // QFC
+                {store: "QFC", brand: "Happy Egg", product: "Free-Range Large Brown Eggs", count: 18, price: 8.99, type: "free-range", size: "large"},
+                {store: "QFC", brand: "Vital Farms", product: "Pasture-Raised Large Brown Eggs", count: 12, price: 8.49, type: "pasture-raised", size: "large"},
+                {store: "QFC", brand: "Vital Farms", product: "Pasture-Raised Large Brown Eggs", count: 18, price: 12.49, type: "pasture-raised", size: "large"},
+                {store: "QFC", brand: "Nellie", product: "Free-Range Large Eggs", count: 12, price: 6.99, type: "free-range", size: "large"},
+                {store: "QFC", brand: "QFC", product: "Cage-Free Large White Grade AA Eggs", count: 12, price: 2.89, type: "cage-free", size: "large"},
+                {store: "QFC", brand: "Simple Truth", product: "Cage-Free Large Brown Eggs", count: 18, price: 8.79, type: "cage-free", size: "large"},
+                {store: "QFC", brand: "QFC", product: "Cage-Free Large White Grade AA Eggs", count: 18, price: 4.29, type: "cage-free", size: "large"},
+                {store: "QFC", brand: "Vital Farms", product: "Pasture-Raised Large Brown Organic Eggs", count: 12, price: 9.99, type: "pasture-raised", size: "large"},
+                {store: "QFC", brand: "Simple Truth", product: "Natural Cage-Free Grade AA Large Brown Eggs", count: 12, price: 5.99, type: "cage-free", size: "large"},
+                {store: "QFC", brand: "QFC", product: "Cage-Free Extra-Large White Grade AA Eggs", count: 12, price: 3.09, type: "cage-free", size: "extra-large"},
+                {store: "QFC", brand: "Happy Egg", product: "Free-Range Brown Eggs", count: 12, price: 7.49, type: "free-range", size: "large"},
+                {store: "QFC", brand: "Eggland's Best", product: "Cage-Free Large White Eggs", count: 18, price: 8.49, type: "cage-free", size: "large"},
+                {store: "QFC", brand: "Simple Truth", product: "Organic Cage-Free Grade AA Large Brown Eggs", count: 12, price: 6.99, type: "cage-free", size: "large"},
+                {store: "QFC", brand: "QFC", product: "Cage-Free Jumbo White Eggs", count: 12, price: 3.29, type: "cage-free", size: "jumbo"},
+                {store: "QFC", brand: "Wilcox", product: "Free-Range Large Brown Organic Omega-3 Eggs", count: 12, price: 7.49, type: "free-range", size: "large"},
+                {store: "QFC", brand: "Pete & Gerry", product: "Organic Free-Range Large Eggs", count: 12, price: 7.99, type: "free-range", size: "large"},
+                {store: "QFC", brand: "Happy Egg", product: "Organic Free-Range Grade A Eggs", count: 18, price: 13.29, type: "free-range", size: "large"},
+                {store: "QFC", brand: "Eggland's Best", product: "Cage-Free Large White Eggs", count: 12, price: 5.69, type: "cage-free", size: "large"},
+                {store: "QFC", brand: "Simple Truth Organic", product: "Cage-Free Large Brown Eggs", count: 18, price: 10.29, type: "cage-free", size: "large"},
+                {store: "QFC", brand: "Pete & Gerry", product: "Organic Free-Range Large Eggs", count: 18, price: 11.79, type: "free-range", size: "large"},
+                {store: "QFC", brand: "Vital Farms", product: "Extra-Large Pasture-Raised Eggs", count: 12, price: 8.99, type: "pasture-raised", size: "extra-large"},
+                {store: "QFC", brand: "Happy Egg", product: "Organic Free-Range Large Brown Eggs", count: 12, price: 8.99, type: "free-range", size: "large"},
+                {store: "QFC", brand: "Nellie", product: "Free Range Large Eggs", count: 18, price: 10.29, type: "free-range", size: "large"},
+                {store: "QFC", brand: "Simple Truth", product: "Kipster Cage-Free Large White Eggs", count: 12, price: 4.99, type: "cage-free", size: "large"},
+                {store: "QFC", brand: "Wilcox", product: "Organic Cage-Free Extra-Large Brown Eggs", count: 6, price: 3.99, type: "cage-free", size: "extra-large"},
+                {store: "QFC", brand: "Wilcox", product: "Pasture-Raised Large Brown Omega-3 Eggs", count: 12, price: 7.69, type: "pasture-raised", size: "large"},
+                {store: "QFC", brand: "Kroger", product: "Extra-Large Grade AA White Eggs", count: 12, price: 3.09, type: "conventional", size: "extra-large"},
+                {store: "QFC", brand: "Eggland's Best", product: "Cage-Free Large Brown Eggs", count: 12, price: 6.19, type: "cage-free", size: "large"},
+                {store: "QFC", brand: "Eggland's Best", product: "Cage-Free Extra-Large White Eggs", count: 12, price: 6.19, type: "cage-free", size: "extra-large"},
+                {store: "QFC", brand: "Eggland's Best", product: "Organic Large Brown Eggs", count: 12, price: 7.19, type: "organic", size: "large"},
+                // TARGET
+                {store: "Target", brand: "Vital Farms", product: "Pasture-Raised Grade A Large Eggs", count: 12, price: 6.89, type: "pasture-raised", size: "large"},
+                {store: "Target", brand: "Happy Egg", product: "Large Brown Organic Free Range Grade A Eggs", count: 12, price: 7.79, type: "organic", size: "large"},
+                {store: "Target", brand: "Good & Gather", product: "Cage-Free Grade A Large Brown Eggs", count: 12, price: 4.29, type: "cage-free", size: "large"},
+                {store: "Target", brand: "Good & Gather", product: "Cage-Free Large White Grade A Eggs", count: 18, price: 4.99, type: "cage-free", size: "large"},
+                {store: "Target", brand: "Good & Gather", product: "Cage-Free Large White Fresh Grade A Eggs", count: 12, price: 2.89, type: "cage-free", size: "large"},
+                {store: "Target", brand: "Vital Farms", product: "Organic Pasture-Raised Grade A Large Eggs", count: 12, price: 9.79, type: "organic", size: "large"},
+                {store: "Target", brand: "Good & Gather", product: "Organic Cage-Free Grade A Large Brown Eggs", count: 12, price: 5.69, type: "organic", size: "large"},
+                {store: "Target", brand: "Vital Farms", product: "Pasture-Raised Large Eggs", count: 18, price: 9.99, type: "pasture-raised", size: "large"},
+                {store: "Target", brand: "Happy Egg", product: "Large Brown Grade A Free Range Brown Eggs", count: 12, price: 7.29, type: "free-range", size: "large"},
+                // WHOLE FOODS
+                {store: "Whole Foods", brand: "Wilcox Farm", product: "Large Grade AA Brown Eggs", count: 12, price: 7.09, type: "conventional", size: "large"},
+                {store: "Whole Foods", brand: "Pete & Gerry's", product: "Large Grade A Eggs", count: 12, price: 6.99, type: "conventional", size: "large"},
+                {store: "Whole Foods", brand: "Vital Farms", product: "Large Grade A Eggs", count: 12, price: 7.99, type: "conventional", size: "large"},
+                {store: "Whole Foods", brand: "Vital Farms", product: "Extra-Large Grade A Eggs", count: 12, price: 8.49, type: "conventional", size: "extra-large"},
+                {store: "Whole Foods", brand: "Vital Farms", product: "Organic Large Grade A Eggs", count: 18, price: 12.99, type: "organic", size: "large"},
+                {store: "Whole Foods", brand: "Pete & Gerry's", product: "Large Grade A Eggs", count: 18, price: 9.99, type: "organic", size: "large"},
+                {store: "Whole Foods", brand: "Vital Farms", product: "Organic Large Grade A Eggs", count: 12, price: 9.99, type: "organic", size: "large"},
+                {store: "Whole Foods", brand: "Vital Farms", product: "Organic Grade A Extra-Large Eggs", count: 12, price: 10.03, type: "organic", size: "extra-large"},
+                {store: "Whole Foods", brand: "Pete & Gerry's", product: "Organic Brown Large Grade A Eggs", count: 12, price: 7.99, type: "organic", size: "large"},
+                {store: "Whole Foods", brand: "Organic Valley", product: "Organic Brown Large Grade A Eggs", count: 12, price: 7.69, type: "organic", size: "large"},
+                {store: "Whole Foods", brand: "Organic Valley", product: "Organic Grade A Large Brown Eggs", count: 18, price: 8.25, type: "organic", size: "large"},
+                {store: "Whole Foods", brand: "Alexandre Family Farms", product: "Organic Jumbo Grade AA Eggs", count: 6, price: 6.49, type: "organic", size: "jumbo"},
+                {store: "Whole Foods", brand: "Pete & Gerry's", product: "Pasture Raised Grade A Brown Eggs", count: 18, price: 8.99, type: "pasture-raised", size: "large"},
+                {store: "Whole Foods", brand: "365 by Whole Foods Market", product: "Large White Grade A Eggs", count: 12, price: 5.49, type: "conventional", size: "large"},
+                {store: "Whole Foods", brand: "365 by Whole Foods Market", product: "Large Brown Grade A Eggs", count: 12, price: 5.49, type: "conventional", size: "large"},
+                {store: "Whole Foods", brand: "365 by Whole Foods Market", product: "Extra-Large Brown Grade A Eggs", count: 12, price: 5.79, type: "conventional", size: "extra-large"},
+                {store: "Whole Foods", brand: "365 by Whole Foods Market", product: "Extra-Large Grade A Brown Eggs", count: 12, price: 6.79, type: "organic", size: "extra-large"},
+                {store: "Whole Foods", brand: "365 by Whole Foods Market", product: "Organic Omega-3 Large Brown Grade A Eggs", count: 12, price: 6.99, type: "organic", size: "large"}
+            ],
+            '98105': [
+                // U-District data will go here when you collect it
+                // For now, leaving it empty to show "Coming Soon" message
+            ]
+        };
 
-        // Calculate price per dozen and per egg for all items
-        eggData.forEach(item => {
-            item.pricePerDozen = Math.round((item.price / item.count) * 12 * 100) / 100;
-            item.pricePerEgg = Math.round((item.price / item.count) * 1000) / 1000;
-        });
-
-        // State management
+        let currentZip = '';
+        let currentData = [];
         let currentFilters = {
             store: 'all',
             size: 'all',
             category: 'all',
             search: ''
         };
-        let currentSort = 'price_low';
-        let currentView = 'grid';
+        let currentSort = 'total_low';
 
-        // Initialize the app
-        function init() {
-            updateLastUpdated();
+        // Handle ZIP code selection
+        document.getElementById('zipSelect').addEventListener('change', function(e) {
+            currentZip = e.target.value;
+            
+            if (currentZip) {
+                // Hide no selection message, show main content
+                document.getElementById('noSelection').style.display = 'none';
+                document.getElementById('mainContent').classList.add('active');
+                
+                // Update subtitle
+                document.querySelector('.subtitle').textContent = `Find the best egg prices in ZIP ${currentZip}`;
+                
+                // Load data for selected ZIP
+                loadDataForZip(currentZip);
+            } else {
+                // Show no selection message, hide main content
+                document.getElementById('noSelection').style.display = 'block';
+                document.getElementById('mainContent').classList.remove('active');
+                document.querySelector('.subtitle').textContent = 'Find the best egg prices in Seattle';
+                currentData = [];
+            }
+        });
+
+        function loadDataForZip(zip) {
+            currentData = eggDataByZip[zip] || [];
+            
+            if (currentData.length === 0) {
+                document.getElementById('productsGrid').innerHTML = `
+                    <div style="grid-column: 1/-1; background: white; padding: 40px; text-align: center; border-radius: 15px;">
+                        <h3>Coming Soon!</h3>
+                        <p>We're still collecting data for this area. Check back soon!</p>
+                    </div>
+                `;
+                // Clear summary cards
+                document.getElementById('cheapestPrice').textContent = '--';
+                document.getElementById('cheapestDetail').textContent = '--';
+                document.getElementById('averagePrice').textContent = '--';
+                document.getElementById('totalListings').textContent = '0';
+                document.getElementById('storeCount').textContent = 'No data yet';
+                document.getElementById('bestStore').textContent = '--';
+                document.getElementById('bestStoreDetail').textContent = '--';
+                updateCategoryCounts();
+                return;
+            }
+            
+            // Calculate price per dozen
+            currentData.forEach(item => {
+                item.pricePerDozen = Math.round((item.price / item.count) * 12 * 100) / 100;
+                item.pricePerEgg = Math.round((item.price / item.count) * 1000) / 1000;
+            });
+            
+            // Update everything
             updateSummaryCards();
             updateCategoryCounts();
             renderProducts();
-            attachEventListeners();
-        }
-
-        // Function to handle store voting
-        function voteForStore(storeName) {
-            // Check if user has already voted for THIS specific store
-            let userVotes = JSON.parse(localStorage.getItem('userVotes') || '[]');
             
-            if (userVotes.includes(storeName)) {
-                // User has already voted for this store
-                const messageDiv = document.getElementById('voteMessage');
-                messageDiv.textContent = `You've already voted for ${storeName}!`;
-                messageDiv.style.display = 'block';
-                messageDiv.style.color = 'orange';
-                
-                setTimeout(() => {
-                    messageDiv.style.display = 'none';
-                }, 3000);
-                return;
-            }
-            
-            // Get existing votes from localStorage
-            let votes = JSON.parse(localStorage.getItem('storeVotes') || '{}');
-            
-            // Increment vote count for this store
-            votes[storeName] = (votes[storeName] || 0) + 1;
-            
-            // Save back to localStorage
-            localStorage.setItem('storeVotes', JSON.stringify(votes));
-            
-            // Add this store to user's voted list
-            userVotes.push(storeName);
-            localStorage.setItem('userVotes', JSON.stringify(userVotes));
-            
-            // Track in Google Analytics
-            if (typeof gtag !== 'undefined') {
-                gtag('event', 'store_vote', {
-                    'store_name': storeName,
-                    'event_category': 'user_engagement',
-                    'event_label': storeName
-                });
-            }
-            
-            // Show confirmation message
-            const messageDiv = document.getElementById('voteMessage');
-            messageDiv.textContent = `Thanks for voting for ${storeName}!`;
-            messageDiv.style.display = 'block';
-            messageDiv.style.color = 'green';
-            
-            // Log to console (you can see this in browser developer tools)
-            console.log('Current votes:', votes);
-            console.log('User has voted for:', userVotes);
-            
-            // Hide message after 3 seconds
-            setTimeout(() => {
-                messageDiv.style.display = 'none';
-            }, 3000);
-            
-            // Disable only this store's button
-            disableVotedButton(storeName);
-        }
-
-        // Show the custom store input field
-        function showOtherStoreInput() {
-            // Always allow custom store requests
-            document.getElementById('otherStoreInput').style.display = 'block';
-            document.getElementById('customStoreName').focus();
-        }
-
-        // Hide the custom store input field
-        function cancelCustomStore() {
-            document.getElementById('otherStoreInput').style.display = 'none';
-            document.getElementById('customStoreName').value = '';
-        }
-
-        // Submit a custom store request
-        function submitCustomStore() {
-            const storeName = document.getElementById('customStoreName').value.trim();
-            
-            if (!storeName) {
-                const messageDiv = document.getElementById('voteMessage');
-                messageDiv.textContent = 'Please enter a store name';
-                messageDiv.style.display = 'block';
-                messageDiv.style.color = 'red';
-                setTimeout(() => {
-                    messageDiv.style.display = 'none';
-                }, 3000);
-                return;
-            }
-            
-            // Check if user has already voted for THIS custom store
-            let userVotes = JSON.parse(localStorage.getItem('userVotes') || '[]');
-            
-            if (userVotes.includes(storeName)) {
-                const messageDiv = document.getElementById('voteMessage');
-                messageDiv.textContent = `You've already voted for ${storeName}!`;
-                messageDiv.style.display = 'block';
-                messageDiv.style.color = 'orange';
-                
-                setTimeout(() => {
-                    messageDiv.style.display = 'none';
-                }, 3000);
-                
-                // Clear but don't hide the input so they can try another store
-                document.getElementById('customStoreName').value = '';
-                return;
-            }
-            
-            // Get existing custom requests from localStorage
-            let customRequests = JSON.parse(localStorage.getItem('customStoreRequests') || '{}');
-            
-            // Increment request count for this store
-            customRequests[storeName] = (customRequests[storeName] || 0) + 1;
-            
-            // Save back to localStorage
-            localStorage.setItem('customStoreRequests', JSON.stringify(customRequests));
-            
-            // Also add to regular votes
-            let votes = JSON.parse(localStorage.getItem('storeVotes') || '{}');
-            votes[storeName] = (votes[storeName] || 0) + 1;
-            localStorage.setItem('storeVotes', JSON.stringify(votes));
-            
-            // Add to user's voted list
-            userVotes.push(storeName);
-            localStorage.setItem('userVotes', JSON.stringify(userVotes));
-            
-            // Track custom store in Google Analytics
-            if (typeof gtag !== 'undefined') {
-                gtag('event', 'custom_store_request', {
-                    'store_name': storeName,
-                    'event_category': 'user_engagement',
-                    'event_label': storeName
-                });
-            }
-            
-            // Show confirmation
-            const messageDiv = document.getElementById('voteMessage');
-            messageDiv.textContent = `Thanks for suggesting ${storeName}!`;
-            messageDiv.style.display = 'block';
-            messageDiv.style.color = 'green';
-            
-            // Clear and hide the input
-            document.getElementById('customStoreName').value = '';
-            document.getElementById('otherStoreInput').style.display = 'none';
-            
-            setTimeout(() => {
-                messageDiv.style.display = 'none';
-            }, 3000);
-            
-            console.log('Custom store requests:', customRequests);
-            console.log('User has voted for:', userVotes);
-        }
-
-        // Disable only the button for stores already voted for
-        function disableVotedButton(storeName) {
-            // Find and disable the specific button
-            const buttons = document.querySelectorAll('button[onclick^="voteForStore"]');
-            buttons.forEach(button => {
-                // Get the onclick attribute and check if it contains the store name
-                const onclickAttr = button.getAttribute('onclick');
-                // Handle both regular quotes and escaped quotes for Trader Joe's
-                if (onclickAttr.includes(`'${storeName}'`) || 
-                    onclickAttr.includes(`'${storeName.replace("'", "\\'")}'`) ||
-                    (storeName === "Trader Joe's" && onclickAttr.includes("Trader Joe"))) {
-                    button.style.opacity = '0.5';
-                    button.style.cursor = 'not-allowed';
-                    button.disabled = true;
-                    button.textContent = `✓ Voted for ${storeName}`;
-                }
-            });
-        }
-
-        // Check vote status when page loads and disable appropriate buttons
-        function checkVoteStatus() {
-            const userVotes = JSON.parse(localStorage.getItem('userVotes') || '[]');
-            
-            // Disable buttons for stores already voted for
-            userVotes.forEach(storeName => {
-                // Only disable preset store buttons, not custom ones
-                if (['Target', 'QFC', "Trader Joe's", 'Whole Foods'].includes(storeName)) {
-                    disableVotedButton(storeName);
-                }
-            });
-            
-            // Show status if user has voted
-            if (userVotes.length > 0) {
-                console.log('You have voted for:', userVotes);
-            }
-        }
-
-        // Allow submitting with Enter key
-        document.addEventListener('DOMContentLoaded', function() {
-            const customInput = document.getElementById('customStoreName');
-            if (customInput) {
-                customInput.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') {
-                        submitCustomStore();
-                    }
-                });
-            }
-            
-            // Check if user has already voted when page loads
-            checkVoteStatus();
-        });
-
-        // Update last updated time
-        function updateLastUpdated() {
+            // Update last updated time
             const now = new Date();
             document.getElementById('lastUpdated').textContent = 
                 `Last updated: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`;
         }
 
-        // Update summary cards
         function updateSummaryCards() {
+            if (currentData.length === 0) return;
+            
             // Find cheapest
-            const cheapest = eggData.reduce((min, item) => 
+            const cheapest = currentData.reduce((min, item) => 
                 item.pricePerDozen < min.pricePerDozen ? item : min);
             
             document.getElementById('cheapestPrice').textContent = `$${cheapest.pricePerDozen}`;
@@ -893,17 +786,17 @@
                 `${cheapest.store} - ${cheapest.brand}`;
 
             // Calculate average
-            const average = eggData.reduce((sum, item) => sum + item.pricePerDozen, 0) / eggData.length;
+            const average = currentData.reduce((sum, item) => sum + item.pricePerDozen, 0) / currentData.length;
             document.getElementById('averagePrice').textContent = `$${average.toFixed(2)}`;
 
             // Total listings
-            document.getElementById('totalListings').textContent = eggData.length;
-            const uniqueStores = [...new Set(eggData.map(item => item.store))];
+            document.getElementById('totalListings').textContent = currentData.length;
+            const uniqueStores = [...new Set(currentData.map(item => item.store))];
             document.getElementById('storeCount').textContent = `From ${uniqueStores.length} stores`;
 
-            // Best store (lowest average)
+            // Best store
             const storeAverages = {};
-            eggData.forEach(item => {
+            currentData.forEach(item => {
                 if (!storeAverages[item.store]) {
                     storeAverages[item.store] = { total: 0, count: 0 };
                 }
@@ -913,8 +806,8 @@
 
             let bestStore = null;
             let bestAverage = Infinity;
-            for (const [store, data] of Object.entries(storeAverages)) {
-                const avg = data.total / data.count;
+            for (const [store, storeData] of Object.entries(storeAverages)) {
+                const avg = storeData.total / storeData.count;
                 if (avg < bestAverage) {
                     bestAverage = avg;
                     bestStore = store;
@@ -926,7 +819,6 @@
                 `Avg: $${bestAverage.toFixed(2)}/dozen`;
         }
 
-        // Update category counts - UPDATED TO BE DYNAMIC
         function updateCategoryCounts() {
             const counts = {
                 all: 0,
@@ -938,7 +830,7 @@
             };
 
             // Only count items that match current filters
-            const filteredData = eggData.filter(item => {
+            const filteredData = currentData.filter(item => {
                 if (currentFilters.store !== 'all' && item.store !== currentFilters.store) return false;
                 if (currentFilters.size !== 'all' && item.size !== currentFilters.size) return false;
                 if (currentFilters.search && !searchMatch(item, currentFilters.search)) return false;
@@ -959,9 +851,8 @@
             document.getElementById('countPastureRaised').textContent = counts['pasture-raised'];
         }
 
-        // Filter products based on current filters
         function filterProducts() {
-            return eggData.filter(item => {
+            return currentData.filter(item => {
                 if (currentFilters.store !== 'all' && item.store !== currentFilters.store) return false;
                 if (currentFilters.size !== 'all' && item.size !== currentFilters.size) return false;
                 if (currentFilters.category !== 'all' && item.type !== currentFilters.category) return false;
@@ -970,7 +861,6 @@
             });
         }
 
-        // Check if product matches search term
         function searchMatch(item, search) {
             const searchLower = search.toLowerCase();
             return item.store.toLowerCase().includes(searchLower) ||
@@ -978,10 +868,13 @@
                    item.product.toLowerCase().includes(searchLower);
         }
 
-        // Sort products
         function sortProducts(products) {
             const sorted = [...products];
             switch (currentSort) {
+                case 'total_low':
+                    return sorted.sort((a, b) => a.price - b.price);
+                case 'total_high':
+                    return sorted.sort((a, b) => b.price - a.price);
                 case 'price_low':
                     return sorted.sort((a, b) => a.pricePerDozen - b.pricePerDozen);
                 case 'price_high':
@@ -990,16 +883,11 @@
                     return sorted.sort((a, b) => a.store.localeCompare(b.store));
                 case 'type':
                     return sorted.sort((a, b) => a.type.localeCompare(b.type));
-                case 'total_low':
-                    return sorted.sort((a, b) => a.price - b.price);
-                case 'total_high':
-                    return sorted.sort((a, b) => b.price - a.price);
                 default:
                     return sorted;
             }
         }
 
-        // Render products
         function renderProducts() {
             const filtered = filterProducts();
             const sorted = sortProducts(filtered);
@@ -1014,7 +902,7 @@
                 return;
             }
 
-            // Find best deal in each category for badges
+            // Find best deal in each category
             const bestDeals = {};
             sorted.forEach(item => {
                 if (!bestDeals[item.type] || item.pricePerDozen < bestDeals[item.type].pricePerDozen) {
@@ -1054,7 +942,7 @@
             }).join('');
         }
 
-        // Attach event listeners - UPDATED TO CALL updateCategoryCounts()
+        // Attach event listeners
         function attachEventListeners() {
             // Store filters
             document.querySelectorAll('[data-filter="store"]').forEach(btn => {
@@ -1063,7 +951,7 @@
                     e.target.classList.add('active');
                     currentFilters.store = e.target.dataset.value;
                     renderProducts();
-                    updateCategoryCounts(); // Added this line
+                    updateCategoryCounts();
                 });
             });
 
@@ -1074,7 +962,7 @@
                     e.target.classList.add('active');
                     currentFilters.size = e.target.dataset.value;
                     renderProducts();
-                    updateCategoryCounts(); // Added this line
+                    updateCategoryCounts();
                 });
             });
 
@@ -1092,7 +980,7 @@
             document.getElementById('searchBox').addEventListener('input', (e) => {
                 currentFilters.search = e.target.value;
                 renderProducts();
-                updateCategoryCounts(); // Added this line
+                updateCategoryCounts();
             });
 
             // Sort select
@@ -1100,25 +988,75 @@
                 currentSort = e.target.value;
                 renderProducts();
             });
+        }
 
-            // View toggle
-            document.querySelectorAll('.view-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
-                    e.target.classList.add('active');
-                    currentView = e.target.dataset.view;
-                    // You could implement list view here
-                    renderProducts();
+        // Store request functions
+        function showOtherStoreInput() {
+            document.getElementById('otherStoreInput').style.display = 'block';
+            document.getElementById('customStoreName').focus();
+        }
+
+        function cancelCustomStore() {
+            document.getElementById('otherStoreInput').style.display = 'none';
+            document.getElementById('customStoreName').value = '';
+        }
+
+        function submitCustomStore() {
+            const storeName = document.getElementById('customStoreName').value.trim();
+            
+            if (!storeName) {
+                const messageDiv = document.getElementById('voteMessage');
+                messageDiv.textContent = 'Please enter a store name';
+                messageDiv.style.display = 'block';
+                messageDiv.style.color = 'red';
+                setTimeout(() => {
+                    messageDiv.style.display = 'none';
+                }, 3000);
+                return;
+            }
+            
+            // Track in Google Analytics
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'custom_store_request', {
+                    'store_name': storeName,
+                    'event_category': 'user_engagement',
+                    'event_label': storeName
                 });
-            });
+            }
+            
+            // Show confirmation
+            const messageDiv = document.getElementById('voteMessage');
+            messageDiv.textContent = `Thanks for suggesting ${storeName}!`;
+            messageDiv.style.display = 'block';
+            messageDiv.style.color = 'green';
+            
+            // Clear and hide the input
+            document.getElementById('customStoreName').value = '';
+            document.getElementById('otherStoreInput').style.display = 'none';
+            
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 3000);
         }
 
         // Initialize when page loads
-        window.addEventListener('DOMContentLoaded', init);
+        window.addEventListener('DOMContentLoaded', function() {
+            attachEventListeners();
+            
+            // Allow submitting with Enter key
+            const customInput = document.getElementById('customStoreName');
+            if (customInput) {
+                customInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        submitCustomStore();
+                    }
+                });
+            }
+        });
     </script>
-    <script id="mcjs">!function(c,h,i,m,p){m=c.createElement(h),p=c.getElementsByTagName(h)[0],m.async=1,m.src=i,p.parentNode.insertBefore(m,p)}(document,"script","https://chimpstatic.com/mcjs-connected/js/users/83890388ccfac6bbdbbf02432/bc75c8fbb5ccefb2b0d5c9d3c.js");</script>
 </body>
 </html>
+
 
 
 
